@@ -5,9 +5,8 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import { User } from '@prisma/client';
-import { UserRole } from '@cft/types';
-import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
-import { UpdateUserRoleSchema, UpdateUserRoleDto } from '@cft/types';
+import { UserRole } from '@/types';
+import { UpdateUserRoleSchema, UpdateUserRoleDto } from '@/types';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)

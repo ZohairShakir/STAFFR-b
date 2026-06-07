@@ -3,7 +3,7 @@ import { ReportsService } from './reports.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { UserRole } from '@cft/types';
+import { UserRole } from '@/types';
 
 @Controller('reports')
 @UseGuards(JwtAuthGuard, RolesGuard)

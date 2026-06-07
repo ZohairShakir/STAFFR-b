@@ -86,10 +86,22 @@ export const RoleSchema = z.object({
 export type Role = z.infer<typeof RoleSchema>;
 
 export const CreateProjectSchema = z.object({
-  title: z.string().min(3).max(150),
-  description: z.string().min(10).max(2000),
-  deadline: z.string().datetime().optional().nullable(),
-  slackChannelId: z.string().optional().nullable(),
+  title: z.string().trim().min(3).max(150),
+  description: z.string().trim().min(10).max(2000),
+  deadline: z.preprocess(
+    (val) => {
+      if (val === '' || val === null || val === undefined) return null;
+      if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val)) {
+        return new Date(`${val}T00:00:00.000Z`).toISOString();
+      }
+      return val;
+    },
+    z.string().datetime().nullable().optional(),
+  ),
+  slackChannelId: z.preprocess(
+    (val) => (val === '' || val === null || val === undefined ? null : val),
+    z.string().min(1).nullable().optional(),
+  ),
   roles: z.array(CreateRoleSchema).min(1),
 });
 

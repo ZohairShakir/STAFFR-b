@@ -1,0 +1,113 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  PROJECT_MANAGER
+  TEAM_MEMBER
+}
+
+enum ProjectStatus {
+  DRAFT
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
+
+enum ApplicationStatus {
+  PENDING
+  REVIEWING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum ApplicationSource {
+  WEB
+  SLACK
+}
+
+model User {
+  id           String        @id @default(uuid())
+  slackId      String        @unique
+  name         String
+  email        String        @unique
+  avatar       String?
+  role         UserRole      @default(TEAM_MEMBER)
+  projects     Project[]     @relation("ManagedProjects")
+  applications Application[]
+  reviews      Application[] @relation("ReviewedApplications")
+  auditLogs    AuditLog[]
+  createdAt    DateTime      @default(now())
+}
+
+model Project {
+  id             String         @id @default(uuid())
+  title          String
+  description    String
+  status         ProjectStatus  @default(DRAFT)
+  manager        User           @relation("ManagedProjects", fields: [managerId], references: [id])
+  managerId      String
+  slackChannelId String?
+  deadline       DateTime?
+  roles          Role[]
+  announcements  Announcement[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model Role {
+  id           String        @id @default(uuid())
+  project      Project       @relation(fields: [projectId], references: [id])
+  projectId    String
+  title        String
+  skills       String[]
+  experience   String
+  openings     Int
+  filled       Int           @default(0)
+  applications Application[]
+}
+
+model Application {
+  id           String            @id @default(uuid())
+  user         User              @relation(fields: [userId], references: [id])
+  userId       String
+  role         Role              @relation(fields: [roleId], references: [id])
+  roleId       String
+  status       ApplicationStatus @default(PENDING)
+  note         String?
+  source       ApplicationSource
+  reviewer     User?             @relation("ReviewedApplications", fields: [reviewedBy], references: [id])
+  reviewedBy   String?
+  reviewedAt   DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+}
+
+model Announcement {
+  id          String   @id @default(uuid())
+  project     Project  @relation(fields: [projectId], references: [id])
+  projectId   String
+  slackTs     String
+  channelId   String
+  messageJson Json
+  sentAt      DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  actor     User     @relation(fields: [actorId], references: [id])
+  actorId   String
+  entity    String
+  entityId  String
+  action    String
+  diff      Json?
+  createdAt DateTime @default(now())
+}

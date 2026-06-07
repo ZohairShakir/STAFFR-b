@@ -1,1 +1,0 @@
-{"version":3,"file":"block-kit.builder.d.ts","sourceRoot":"","sources":["../../src/slack/block-kit.builder.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,OAAO,EAAE,IAAI,EAAE,MAAM,gBAAgB,CAAC;AAE/C,qBACa,eAAe;IAC1B;;;OAGG;IACH,wBAAwB,CAAC,OAAO,EAAE,OAAO,GAAG;QAAE,KAAK,EAAE,IAAI,EAAE,CAAC;QAAC,OAAO,EAAE;YAAE,IAAI,EAAE,MAAM,CAAA;SAAE,CAAA;KAAE;CAkEzF"}

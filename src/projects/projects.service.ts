@@ -1,7 +1,7 @@
 import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProjectStatus, User } from '@prisma/client';
-import { CreateProjectDto, UpdateProjectDto, UserRole } from '@/types';
+import { CreateProjectDto, UpdateProjectDto, UserRole } from '../types';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 

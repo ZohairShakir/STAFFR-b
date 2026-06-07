@@ -1,6 +1,6 @@
 import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateRoleDto, UpdateRoleDto, UserRole } from '@/types';
+import { CreateRoleDto, UpdateRoleDto, UserRole } from '../types';
 import { User } from '@prisma/client';
 
 @Injectable()

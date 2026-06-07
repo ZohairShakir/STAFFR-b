@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { ApplicationsService } from '../applications/applications.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { SlackService } from './slack.service';
-import { ApplicationSource } from '@/types';
+import { ApplicationSource } from '../types';
 import * as crypto from 'crypto';
 
 @Controller('slack')

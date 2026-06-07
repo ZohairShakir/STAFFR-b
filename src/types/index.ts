@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export enum UserRole {
   SUPER_ADMIN = 'SUPER_ADMIN',
   ADMIN = 'ADMIN',
@@ -35,9 +37,6 @@ export const ROLE_HIERARCHY: Record<UserRole, number> = {
 export function hasRole(userRole: UserRole, requiredRole: UserRole): boolean {
   return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
 }
-
-import { z } from 'zod';
-import { UserRole, ProjectStatus, ApplicationStatus, ApplicationSource } from './enums';
 
 export const UserSchema = z.object({
   id: z.string().uuid(),

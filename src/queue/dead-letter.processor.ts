@@ -2,7 +2,7 @@ import { Processor, OnQueueFailed } from '@nestjs/bull';
 import { Job } from 'bull';
 import { PrismaService } from '../prisma/prisma.service';
 import { SlackService } from '../slack/slack.service';
-import { UserRole } from '@/types';
+import { UserRole } from '../types';
 
 @Processor('slack-announce')
 export class DeadLetterAnnounceProcessor {

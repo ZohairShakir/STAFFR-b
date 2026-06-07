@@ -15,8 +15,8 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import { User, ApplicationStatus } from '@prisma/client';
-import { UserRole } from '@/types';
-import { CreateApplicationSchema, CreateApplicationDto, UpdateApplicationStatusSchema, UpdateApplicationStatusDto } from '@/types';
+import { UserRole } from '../types';
+import { CreateApplicationSchema, CreateApplicationDto, UpdateApplicationStatusSchema, UpdateApplicationStatusDto } from '../types';
 
 @Controller('applications')
 @UseGuards(JwtAuthGuard, RolesGuard)

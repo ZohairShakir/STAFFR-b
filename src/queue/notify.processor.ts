@@ -1,5 +1,6 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { SlackService } from '../slack/slack.service';
 import { EventsGateway } from '../gateway/events.gateway';
@@ -7,11 +8,16 @@ import { ApplicationStatus } from '@prisma/client';
 
 @Processor('notify')
 export class NotifyProcessor {
+  private readonly appUrl: string;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly slackService: SlackService,
     private readonly eventsGateway: EventsGateway,
-  ) {}
+    configService: ConfigService,
+  ) {
+    this.appUrl = configService.get<string>('APP_URL') || 'http://localhost:3000';
+  }
 
   @Process('new-application')
   async handleNewApplication(job: Job<{ applicationStatic: any }>) {
@@ -28,7 +34,7 @@ export class NotifyProcessor {
     }
 
     // Send DM to project manager alerting them of the application
-    const managerText = `👋 Hello! *${applicant.name}* has applied for the *${roleTitle}* role on your project *${projectTitle}*.\nReview applications here: http://localhost:3000/projects/${applicationStatic.role.projectId}`;
+    const managerText = `👋 Hello! *${applicant.name}* has applied for the *${roleTitle}* role on your project *${projectTitle}*.\nReview applications here: ${this.appUrl}/projects/${applicationStatic.role.projectId}`;
     if (manager.slackId) {
       await this.slackService.sendDM(manager.slackId, managerText);
     }
@@ -61,7 +67,7 @@ export class NotifyProcessor {
     const projectTitle = application.role.project.title;
 
     // Build notification message
-    const msg = `🔔 *Application Status Update*\nYour application for the role *${roleTitle}* in project *${projectTitle}* has transitioned to: *${status}*.\nReview details on your dashboard: http://localhost:3000/applications`;
+    const msg = `🔔 *Application Status Update*\nYour application for the role *${roleTitle}* in project *${projectTitle}* has transitioned to: *${status}*.\nReview details on your dashboard: ${this.appUrl}/applications`;
 
     await this.slackService.sendDM(application.user.slackId, msg);
 

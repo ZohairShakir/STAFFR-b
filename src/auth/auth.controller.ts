@@ -5,18 +5,21 @@ import {
   Query,
   Res,
   Req,
-  NotFoundException,
   Body,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Response, Request } from 'express';
+import { Response, Request, CookieOptions } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
-import { GetUser } from '../common/decorators/get-user.decorator';
-import { User } from '@prisma/client';
 import * as jwt from 'jsonwebtoken';
 
-const COOKIE_OPTS = { httpOnly: true, secure: true, sameSite: 'none', path: '/' };
+const isProduction = process.env.NODE_ENV === 'production';
+const COOKIE_OPTS: CookieOptions = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? 'none' : 'lax',
+  path: '/',
+};
 const ACCESS_OPTS = { ...COOKIE_OPTS, maxAge: 15 * 60 * 1000 };
 const REFRESH_OPTS = { ...COOKIE_OPTS, maxAge: 7 * 24 * 60 * 60 * 1000 };
 
@@ -104,7 +107,7 @@ export class AuthController {
     }
 
     ['access_token', 'refresh_token'].forEach((name) => {
-      ['none', 'lax'].forEach((sameSite) => {
+      (['none', 'lax'] as const).forEach((sameSite) => {
         res.clearCookie(name, { path: '/', sameSite, secure: sameSite === 'none' });
       });
     });
@@ -112,27 +115,4 @@ export class AuthController {
     return res.json({ success: true });
   }
 
-  @Get('me')
-  async me(@Req() req: Request) {
-    const token = req.cookies['access_token'] || (req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.slice(7) : null);
-    if (!token) {
-      throw new UnauthorizedException('Not authenticated');
-    }
-
-    try {
-      const decoded = jwt.decode(token) as any;
-      if (!decoded?.sub) {
-        throw new UnauthorizedException('Invalid token');
-      }
-
-      const user = await this.authService.validateUser(decoded.sub);
-      if (!user) {
-        throw new UnauthorizedException('User not found');
-      }
-
-      return { user };
-    } catch (err) {
-      throw new UnauthorizedException('Not authenticated');
-    }
-  }
 }

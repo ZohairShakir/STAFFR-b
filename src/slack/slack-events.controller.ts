@@ -86,7 +86,7 @@ export class SlackEventsController {
               data: {
                 slackId: slackUserId,
                 name: profile.user.real_name || slackUserName,
-                email: profile.user.profile?.email || `${slackUserId}@slack.cft`,
+                email: profile.user.profile?.email || undefined,
                 avatar: profile.user.profile?.image_192 || null,
               },
             });

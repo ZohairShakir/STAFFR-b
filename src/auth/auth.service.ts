@@ -140,6 +140,10 @@ export class AuthService {
     await this.redis.del(`refresh:${userId}`);
   }
 
+  async validateUser(userId: string): Promise<User | null> {
+    return this.prisma.user.findUnique({ where: { id: userId } });
+  }
+
   private async notifySuperAdminsNewUser(newUser: User) {
     try {
       const admins = await this.prisma.user.findMany({

@@ -7,7 +7,7 @@ async function main() {
 
   // 1. Create Users
   const superAdmin = await prisma.user.upsert({
-    where: { email: 'superadmin@cft.com' },
+    where: { slackId: 'U11111111' },
     update: {},
     create: {
       slackId: 'U11111111',
@@ -19,7 +19,7 @@ async function main() {
   });
 
   const manager = await prisma.user.upsert({
-    where: { email: 'manager@cft.com' },
+    where: { slackId: 'U22222222' },
     update: {},
     create: {
       slackId: 'U22222222',
@@ -31,7 +31,7 @@ async function main() {
   });
 
   const member = await prisma.user.upsert({
-    where: { email: 'member@cft.com' },
+    where: { slackId: 'U33333333' },
     update: {},
     create: {
       slackId: 'U33333333',

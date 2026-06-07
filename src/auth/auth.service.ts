@@ -72,11 +72,11 @@ export class AuthService {
       // Upsert User by slackId
       const user = await this.prisma.user.upsert({
         where: { slackId },
-        update: { name, email: email || '', avatar },
+        update: { name, avatar },
         create: {
           slackId,
           name,
-          email: email || '',
+          email: email || undefined,
           avatar,
           role: defaultRole,
         },

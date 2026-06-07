@@ -48,19 +48,18 @@ export class AuthController {
       // Set Access Token in HttpOnly cookie
       res.cookie('access_token', accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        secure: true,
+        sameSite: 'none',
         path: '/',
-        maxAge: 15 * 60 * 1000, // 15 mins
+        maxAge: 15 * 60 * 1000,
       });
 
-      // Set Refresh Token in separate cookie (or frontend can pass it explicitly, but let's keep it safe)
       res.cookie('refresh_token', refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        secure: true,
+        sameSite: 'none',
         path: '/',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
       // Redirect back to Next.js dashboard

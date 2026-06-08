@@ -10,7 +10,10 @@ import Redis from 'ioredis';
       useFactory: (configService: ConfigService) => {
         const redisUrl = configService.get<string>('REDIS_URL') || '';
         return {
-          createClient: () => new Redis(redisUrl),
+          createClient: () => new Redis(redisUrl, {
+            enableReadyCheck: false,
+            maxRetriesPerRequest: null,
+          }),
         };
       },
       inject: [ConfigService],

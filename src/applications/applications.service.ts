@@ -1,7 +1,7 @@
 import { Injectable, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ApplicationStatus, ApplicationSource, User } from '@prisma/client';
-import { CreateApplicationDto, UserRole } from '../types';
+import { CreateApplicationDto, UserRole, hasRole } from '../types';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 
@@ -176,17 +176,14 @@ export class ApplicationsService {
       throw new NotFoundException('Application not found');
     }
 
-    // Reviewer must be manager of the project or Admin+
-    if (
-      application.role.project.managerId !== reviewer.id &&
-      reviewer.role !== UserRole.ADMIN &&
-      reviewer.role !== UserRole.SUPER_ADMIN
-    ) {
+    const isProjectManager = application.role.project.managerId === reviewer.id;
+    const isAdminOrAbove = hasRole(reviewer.role as UserRole, UserRole.ADMIN);
+
+    if (!isProjectManager && !isAdminOrAbove) {
       throw new ForbiddenException('Only the project manager or an administrator can review applications');
     }
 
-    return this.prisma.$transaction(async (tx: any) => {
-
+    const updated = await this.prisma.$transaction(async (tx: any) => {
       // If updating status to ACCEPTED, increment role's filled slot count
       if (newStatus === ApplicationStatus.ACCEPTED && application.status !== ApplicationStatus.ACCEPTED) {
         const currentRole = await tx.role.findUnique({ where: { id: application.roleId } });
@@ -206,7 +203,7 @@ export class ApplicationsService {
         });
       }
 
-      const updated = await tx.application.update({
+      return tx.application.update({
         where: { id },
         data: {
           status: newStatus,
@@ -226,15 +223,18 @@ export class ApplicationsService {
           },
         },
       });
+    });
 
-      // Dispatch notification queue task to send Slack DM to applicant
+    try {
       await this.notifyQueue.add('status-change', {
         applicationId: updated.id,
         status: newStatus,
       });
+    } catch {
+      // Status update should succeed even if the notification queue is unavailable
+    }
 
-      return updated;
-    });
+    return updated;
   }
 
   async withdraw(id: string, user: User) {

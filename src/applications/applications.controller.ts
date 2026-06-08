@@ -48,7 +48,7 @@ export class ApplicationsController {
   }
 
   @Patch(':id/status')
-  @Roles(UserRole.PROJECT_MANAGER)
+  @Roles(UserRole.PROJECT_MANAGER, UserRole.ADMIN, UserRole.SUPER_ADMIN)
   updateStatus(
     @Param('id') id: string,
     @GetUser() reviewer: User,

@@ -7,9 +7,12 @@ import { json, urlencoded } from 'express';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Enable CORS
+  // Enable CORS — APP_URL can be comma-separated for multiple origins (e.g. Vercel + localhost)
+  const allowedOrigins = (process.env.APP_URL || 'http://localhost:3000')
+    .split(',')
+    .map((u) => u.trim());
   app.enableCors({
-    origin: process.env.APP_URL || 'http://localhost:3000',
+    origin: allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins,
     credentials: true,
   });
 

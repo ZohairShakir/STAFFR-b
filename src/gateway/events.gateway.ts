@@ -8,9 +8,13 @@ import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
+const wsOrigins = (process.env.APP_URL || 'http://localhost:3000')
+  .split(',')
+  .map((u) => u.trim());
+
 @WebSocketGateway({
   cors: {
-    origin: process.env.APP_URL || 'http://localhost:3000',
+    origin: wsOrigins.length === 1 ? wsOrigins[0] : wsOrigins,
     credentials: true,
   },
 })

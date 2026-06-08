@@ -89,7 +89,7 @@ export class AuthService {
 
       // Generate credentials
       const accessToken = this.generateAccessToken(user);
-      const refreshToken = this.generateRefreshToken();
+      const refreshToken = this.generateRefreshToken(user.id);
 
       // Store refresh token in Redis: key = refresh:{userId}, value = refreshToken, expiry = 7d (604800s)
       await this.redis.set(`refresh:${user.id}`, refreshToken, 'EX', 604800);
@@ -109,8 +109,8 @@ export class AuthService {
     });
   }
 
-  generateRefreshToken() {
-    const payload = {};
+  generateRefreshToken(userId: string) {
+    const payload = { sub: userId };
     return this.jwtService.sign(payload, {
       secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
       expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRES_IN') || '7d',
@@ -129,7 +129,7 @@ export class AuthService {
     }
 
     const accessToken = this.generateAccessToken(user);
-    const refreshToken = this.generateRefreshToken();
+    const refreshToken = this.generateRefreshToken(user.id);
 
     await this.redis.set(`refresh:${user.id}`, refreshToken, 'EX', 604800);
 

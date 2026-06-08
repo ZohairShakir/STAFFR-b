@@ -20,7 +20,7 @@ const COOKIE_OPTS: CookieOptions = {
   sameSite: isProduction ? 'none' : 'lax',
   path: '/',
 };
-const ACCESS_OPTS = { ...COOKIE_OPTS, maxAge: 15 * 60 * 1000 };
+const ACCESS_OPTS = { ...COOKIE_OPTS, maxAge: 2 * 60 * 60 * 1000 };
 const REFRESH_OPTS = { ...COOKIE_OPTS, maxAge: 7 * 24 * 60 * 60 * 1000 };
 
 @Controller('auth')

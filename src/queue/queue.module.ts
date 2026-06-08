@@ -1,14 +1,18 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 import { ConfigService, ConfigModule } from '@nestjs/config';
+import Redis from 'ioredis';
 
 @Module({
   imports: [
     BullModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        url: configService.get<string>('REDIS_URL'),
-      }),
+      useFactory: (configService: ConfigService) => {
+        const redisUrl = configService.get<string>('REDIS_URL') || '';
+        return {
+          createClient: () => new Redis(redisUrl),
+        };
+      },
       inject: [ConfigService],
     }),
     BullModule.registerQueue(

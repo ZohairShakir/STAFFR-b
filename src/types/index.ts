@@ -237,7 +237,10 @@ export interface TimeToHireReport {
 export type WsEventName =
   | 'project.updated'
   | 'application.created'
-  | 'application.statusChanged';
+  | 'application.statusChanged'
+  | 'user.created'
+  | 'user.roleUpdated'
+  | 'audit.created';
 
 export interface WsEvent<T = unknown> {
   event: WsEventName;

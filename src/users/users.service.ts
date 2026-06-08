@@ -1,10 +1,14 @@
 import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { EventsGateway } from '../gateway/events.gateway';
 import { UserRole } from '../types';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventsGateway: EventsGateway,
+  ) {}
 
   async findMe(id: string) {
     return this.prisma.user.findUnique({
@@ -41,9 +45,17 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    return this.prisma.user.update({
+    const updatedUser = await this.prisma.user.update({
       where: { id: targetUserId },
       data: { role: newRole },
     });
+
+    // Emit event to notify the user about role change
+    this.eventsGateway.emitEvent('user.roleUpdated', {
+      userId: targetUserId,
+      newRole: newRole,
+    });
+
+    return updatedUser;
   }
 }

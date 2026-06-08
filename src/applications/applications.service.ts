@@ -23,6 +23,10 @@ export class ApplicationsService {
       throw new NotFoundException('Target role not found');
     }
 
+    if (role.project.status !== 'OPEN') {
+      throw new BadRequestException('This project is not accepting applications');
+    }
+
     // Check if role openings are already filled
     if (role.filled >= role.openings) {
       throw new BadRequestException('Role openings are already completely filled');

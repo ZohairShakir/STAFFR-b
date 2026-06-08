@@ -7,7 +7,7 @@ import { ConfigService, ConfigModule } from '@nestjs/config';
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        redis: configService.get<string>('REDIS_URL'),
+        url: configService.get<string>('REDIS_URL'),
       }),
       inject: [ConfigService],
     }),

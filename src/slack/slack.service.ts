@@ -1,27 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { App } from '@slack/bolt';
 import { WebClient } from '@slack/web-api';
 
 @Injectable()
 export class SlackService {
-  public boltApp: App;
   public botClient: WebClient;
 
   constructor(private readonly config: ConfigService) {
     const token = this.config.get<string>('SLACK_BOT_TOKEN');
-    const signingSecret = this.config.get<string>('SLACK_SIGNING_SECRET');
-
-    // Initialize WebClient
     this.botClient = new WebClient(token);
-
-    // Initialize Bolt App
-    this.boltApp = new App({
-      token,
-      signingSecret,
-      // Disable default receiver since NestJS handles the /slack/events path manually
-      receiver: undefined,
-    });
   }
 
   /**

@@ -18,14 +18,16 @@ export class SlackAnnounceProcessor {
   async handleAnnounce(job: Job<{ projectId: string }>) {
     const { projectId } = job.data;
 
-    // Fetch complete project details
+    // Single fetch with everything needed for announcement + websocket emit
     const project = await this.prisma.project.findUnique({
       where: { id: projectId },
       include: {
-        roles: true,
-        manager: {
-          select: {
-            name: true,
+        manager: true,
+        roles: {
+          include: {
+            _count: {
+              select: { applications: true },
+            },
           },
         },
       },
@@ -54,19 +56,6 @@ export class SlackAnnounceProcessor {
     });
 
     // Notify WebSocket subscribers of update
-    const updatedProject = await this.prisma.project.findUnique({
-      where: { id: projectId },
-      include: {
-        manager: true,
-        roles: {
-          include: {
-            _count: {
-              select: { applications: true },
-            },
-          },
-        },
-      },
-    });
-    this.eventsGateway.emitEvent('project.updated', updatedProject);
+    this.eventsGateway.emitEvent('project.updated', project);
   }
 }
